@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "linux-service-manager": {
+      "command": "./mcp-server",
+      "args": ["-mcp"],
+      "env": {
+        "LOG_LEVEL": "error"
+      }
+    }
+  }
+}

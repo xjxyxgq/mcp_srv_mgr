@@ -1,0 +1,68 @@
+# 二进制文件
+mcp-server
+mcp-server.exe
+*.exe
+*.so
+*.dylib
+
+# 构建目录
+dist/
+build/
+bin/
+
+# 测试文件
+coverage.out
+coverage.html
+*.test
+test_*.log
+benchmark_results.txt
+test_report_*.md
+
+# Go相关
+*.sum
+vendor/
+
+# IDE文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 临时文件
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+logs/
+
+# 配置文件（保留示例文件）
+config.yaml
+!config.yaml.example
+
+# Docker相关
+.dockerignore
+
+# 性能分析文件
+*.prof
+*.pprof
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+
+# 备份文件
+*.bak
+*.backup
+
+# 压缩文件
+*.tar.gz
+*.tar.bz2
+*.zip
+
+# 系统文件
+.system/
