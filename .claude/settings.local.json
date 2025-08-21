@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(chmod:*)",
+      "Bash(./quick-test.sh:*)",
+      "Bash(./deploy-unla-gateway.sh:*)",
+      "Bash(go mod tidy)",
+      "Bash(go build -o mcp-gateway ./cmd/mcp-gateway)",
+      "Bash(mkdir -p configs)",
+      "Bash(cp \"/Users/xuguoqiang/SynologyDrive/Backup/MI_office_notebook/D/myworkspace/nucc_workspace/program/src/nucc.com/mcp_srv_mgr/test-unla-config.yaml\" ./configs/)",
+      "Bash(curl:*)",
+      "Bash(pgrep:*)",
+      "Bash(./mcp-gateway --help)",
+      "Bash(pkill:*)",
+      "Bash(./test-integration.sh:*)",
+      "Bash(find . -name \"*.md\" -exec grep -l \"register\\|configuration\" {} ;)",
+      "Bash(sqlite3:*)",
+      "Bash(./insert-mcp-config.sh)",
+      "Bash(kill -HUP 17936)",
+      "Bash(kill -HUP 19088)",
+      "Bash(./mcp-gateway test)"
+    ],
+    "deny": [],
+    "ask": [],
+    "additionalDirectories": [
+      "/Users/xuguoqiang/unla-gateway"
+    ]
+  }
+}

@@ -31,16 +31,31 @@ func NewServer(logger *logrus.Logger) *Server {
 	if managers.IsSystemdAvailable() {
 		server.managers[types.ServiceTypeSystemd] = managers.NewSystemdManager()
 		logger.Info("Systemd manager initialized")
+	} else {
+		logger.Debug("Systemd not available on this system")
 	}
 
 	if managers.IsSysVAvailable() {
 		server.managers[types.ServiceTypeSysV] = managers.NewSysVManager()
 		logger.Info("SysV manager initialized")
+	} else {
+		logger.Debug("SysV not available on this system")
 	}
 
 	if managers.IsDockerAvailable() {
 		server.managers[types.ServiceTypeDocker] = managers.NewDockerManager()
 		logger.Info("Docker manager initialized")
+	} else {
+		logger.Debug("Docker not available on this system")
+	}
+
+	if len(server.managers) == 0 {
+		logger.Warn("No service managers available")
+		// 添加一个mock管理器用于测试
+		server.managers[types.ServiceTypeSystemd] = managers.NewMockManager(types.ServiceTypeSystemd)
+		server.managers[types.ServiceTypeDocker] = managers.NewMockManager(types.ServiceTypeDocker)
+		server.managers[types.ServiceTypeSysV] = managers.NewMockManager(types.ServiceTypeSysV)
+		logger.Info("Mock managers initialized for testing")
 	}
 
 	return server

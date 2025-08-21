@@ -17,10 +17,12 @@ import (
 
 func main() {
 	var (
-		configPath = flag.String("config", "config.yaml", "Path to configuration file")
-		mode       = flag.String("mode", "mcp", "Server mode: mcp or http")
-		httpMode   = flag.Bool("http", false, "Start HTTP server instead of MCP server")
-		help       = flag.Bool("help", false, "Show help message")
+		configPath    = flag.String("config", "config.yaml", "Path to configuration file")
+		mode          = flag.String("mode", "mcp", "Server mode: mcp, http, mcp-http, or mcp-streamable")
+		httpMode      = flag.Bool("http", false, "Start HTTP server instead of MCP server")
+		mcpHTTP       = flag.Bool("mcp-http", false, "Start MCP over HTTP (SSE) server")
+		mcpStreamable = flag.Bool("mcp-streamable", false, "Start MCP Streamable HTTP server")
+		help          = flag.Bool("help", false, "Show help message")
 	)
 	flag.Parse()
 
@@ -32,6 +34,16 @@ func main() {
 	// HTTP mode takes precedence
 	if *httpMode {
 		*mode = "http"
+	}
+	
+	// MCP HTTP mode takes precedence
+	if *mcpHTTP {
+		*mode = "mcp-http"
+	}
+	
+	// MCP Streamable mode takes precedence
+	if *mcpStreamable {
+		*mode = "mcp-streamable"
 	}
 
 	// Load configuration
@@ -69,8 +81,12 @@ func main() {
 		startHTTPServer(cfg, logger, sigChan)
 	case "mcp":
 		startMCPServer(logger, sigChan)
+	case "mcp-http":
+		startMCPHTTPServer(cfg, logger, sigChan)
+	case "mcp-streamable":
+		startMCPStreamableServer(cfg, logger, sigChan)
 	default:
-		logger.Fatalf("Unknown mode: %s. Use 'mcp' or 'http'", *mode)
+		logger.Fatalf("Unknown mode: %s. Use 'mcp', 'http', 'mcp-http', or 'mcp-streamable'", *mode)
 	}
 }
 
@@ -100,6 +116,34 @@ func startMCPServer(logger *logrus.Logger, sigChan chan os.Signal) {
 	logger.Info("Shutting down MCP server...")
 }
 
+func startMCPHTTPServer(cfg *config.Config, logger *logrus.Logger, sigChan chan os.Signal) {
+	mcpHTTPServer := server.NewMCPHTTPServer(cfg, logger)
+
+	go func() {
+		logger.Info("Starting MCP HTTP server...")
+		if err := mcpHTTPServer.Start(); err != nil {
+			logger.Fatalf("MCP HTTP server failed: %v", err)
+		}
+	}()
+
+	<-sigChan
+	logger.Info("Shutting down MCP HTTP server...")
+}
+
+func startMCPStreamableServer(cfg *config.Config, logger *logrus.Logger, sigChan chan os.Signal) {
+	mcpStreamableServer := server.NewMCPStreamableServer(cfg, logger)
+
+	go func() {
+		logger.Info("Starting MCP Streamable server...")
+		if err := mcpStreamableServer.Start(); err != nil {
+			logger.Fatalf("MCP Streamable server failed: %v", err)
+		}
+	}()
+
+	<-sigChan
+	logger.Info("Shutting down MCP Streamable server...")
+}
+
 func showHelp() {
 	fmt.Printf(`MCP Service Manager
 
@@ -112,9 +156,13 @@ Options:
   -config string
         Path to configuration file (default "config.yaml")
   -mode string
-        Server mode: mcp or http (default "mcp")
+        Server mode: mcp, http, mcp-http, or mcp-streamable (default "mcp")
   -http
         Start HTTP server instead of MCP server (same as -mode=http)
+  -mcp-http
+        Start MCP over HTTP (SSE) server (same as -mode=mcp-http)
+  -mcp-streamable
+        Start MCP Streamable HTTP server (same as -mode=mcp-streamable)
   -help
         Show this help message
 
@@ -122,15 +170,20 @@ Examples:
   # Start MCP server (default mode)
   %s
 
-  # Start HTTP server
+  # Start HTTP REST API server
   %s -http
   %s -mode=http
 
+  # Start MCP over HTTP (SSE) server
+  %s -mcp-http
+  %s -mode=mcp-http
+
+  # Start MCP Streamable HTTP server
+  %s -mcp-streamable
+  %s -mode=mcp-streamable
+
   # Use custom config file
   %s -config=/path/to/config.yaml
-
-  # Start with debug logging (set in config file)
-  %s -config=debug-config.yaml
 
 Supported service types:
   - systemd (modern Linux distributions)
@@ -138,5 +191,5 @@ Supported service types:
   - Docker containers
 
 The server will automatically detect available service managers on your system.
-`, os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0])
+`, os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0])
 }

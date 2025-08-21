@@ -1,8 +1,0 @@
-server:
-  host: "127.0.0.1"
-  port: 8080
-
-log:
-  level: "info"      # debug, info, warn, error
-  format: "json"     # json, text
-  output: "stdout"   # stdout, stderr
