@@ -1,0 +1,24 @@
+# Minimal MCP Gateway Configuration
+name: mcp_srv_mgr_gateway
+description: "MCP Service Manager Gateway"
+
+# Use environment variables for configuration
+database:
+  type: "${GATEWAY_DB_TYPE:sqlite}"
+  host: "${GATEWAY_DB_HOST:localhost}"
+  port: "${GATEWAY_DB_PORT:5432}"
+  user: "${GATEWAY_DB_USER:root}"
+  password: "${GATEWAY_DB_PASSWORD:nov24feb11}"
+  dbname: "${GATEWAY_DB_NAME:./test_mcp_gateway/unla-gateway.db}"
+  sslmode: "${GATEWAY_DB_SSL_MODE:disable}"
+
+storage:
+  type: "${GATEWAY_STORAGE_TYPE:db}"
+
+server:
+  port: "${GATEWAY_PORT:8081}"
+  host: "${GATEWAY_HOST:0.0.0.0}"
+
+notifier:
+  role: "${NOTIFIER_ROLE:receiver}"
+  type: "${NOTIFIER_TYPE:signal}"

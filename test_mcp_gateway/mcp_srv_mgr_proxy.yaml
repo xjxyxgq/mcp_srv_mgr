@@ -1,0 +1,217 @@
+name: "mcp_srv_mgr"
+tenant: "default"
+
+routers:
+  - server: "mcp_srv_mgr"
+    prefix: "/mcp-service-manager"
+    cors:
+      allowOrigins:
+        - "*"
+      allowMethods:
+        - "GET"
+        - "POST"
+        - "PUT"
+        - "DELETE"
+        - "OPTIONS"
+      allowHeaders:
+        - "Content-Type"
+        - "Authorization"
+        - "Mcp-Session-Id"
+        - "mcp-protocol-version"
+      exposeHeaders:
+        - "Mcp-Session-Id"
+        - "mcp-protocol-version"
+      allowCredentials: true
+
+servers:
+  - name: "mcp_srv_mgr"
+    description: "Linux Service Management System"
+    allowedTools:
+      - "list_services"
+      - "get_service_status"
+      - "start_service"
+      - "stop_service"
+      - "restart_service"
+      - "enable_service"
+      - "disable_service"
+      - "get_docker_logs"
+
+tools:
+  - name: "list_services"
+    description: "List all available services in the system"
+    method: "GET"
+    endpoint: "http://localhost:8080/services"
+    args:
+      - name: "type"
+        position: "query"
+        required: false
+        type: "string"
+        description: "Filter by service type (systemd, sysv, docker)"
+        default: ""
+    responseBody: |-
+      {
+        "success": {{.Response.Data.success}},
+        "message": "{{.Response.Data.message}}",
+        "services": {{ toJSON .Response.Data.services }}
+      }
+
+  - name: "get_service_status"
+    description: "Get the status of a specific service"
+    method: "GET"
+    endpoint: "http://localhost:8080/services/{{.Args.service_name}}/status"
+    args:
+      - name: "service_name"
+        position: "path"
+        required: true
+        type: "string"
+        description: "Name of the service to check"
+      - name: "type"
+        position: "query"
+        required: false
+        type: "string"
+        description: "Service type (systemd, sysv, docker)"
+        default: ""
+    responseBody: |-
+      {
+        "success": {{.Response.Data.success}},
+        "message": "{{.Response.Data.message}}",
+        "service": {{ toJSON .Response.Data.service }}
+      }
+
+  - name: "start_service"
+    description: "Start a service"
+    method: "POST"
+    endpoint: "http://localhost:8080/services/{{.Args.service_name}}/start"
+    args:
+      - name: "service_name"
+        position: "path"
+        required: true
+        type: "string"
+        description: "Name of the service to start"
+      - name: "type"
+        position: "query"
+        required: false
+        type: "string"
+        description: "Service type (systemd, sysv, docker)"
+        default: ""
+    responseBody: |-
+      {
+        "success": {{.Response.Data.success}},
+        "message": "{{.Response.Data.message}}",
+        "service": {{ toJSON .Response.Data.service }}
+      }
+
+  - name: "stop_service"
+    description: "Stop a service"
+    method: "POST"
+    endpoint: "http://localhost:8080/services/{{.Args.service_name}}/stop"
+    args:
+      - name: "service_name"
+        position: "path"
+        required: true
+        type: "string"
+        description: "Name of the service to stop"
+      - name: "type"
+        position: "query"
+        required: false
+        type: "string"
+        description: "Service type (systemd, sysv, docker)"
+        default: ""
+    responseBody: |-
+      {
+        "success": {{.Response.Data.success}},
+        "message": "{{.Response.Data.message}}",
+        "service": {{ toJSON .Response.Data.service }}
+      }
+
+  - name: "restart_service"
+    description: "Restart a service"
+    method: "POST"
+    endpoint: "http://localhost:8080/services/{{.Args.service_name}}/restart"
+    args:
+      - name: "service_name"
+        position: "path"
+        required: true
+        type: "string"
+        description: "Name of the service to restart"
+      - name: "type"
+        position: "query"
+        required: false
+        type: "string"
+        description: "Service type (systemd, sysv, docker)"
+        default: ""
+    responseBody: |-
+      {
+        "success": {{.Response.Data.success}},
+        "message": "{{.Response.Data.message}}",
+        "service": {{ toJSON .Response.Data.service }}
+      }
+
+  - name: "enable_service"
+    description: "Enable a service to start at boot"
+    method: "POST"
+    endpoint: "http://localhost:8080/services/{{.Args.service_name}}/enable"
+    args:
+      - name: "service_name"
+        position: "path"
+        required: true
+        type: "string"
+        description: "Name of the service to enable"
+      - name: "type"
+        position: "query"
+        required: false
+        type: "string"
+        description: "Service type (systemd, sysv, docker)"
+        default: ""
+    responseBody: |-
+      {
+        "success": {{.Response.Data.success}},
+        "message": "{{.Response.Data.message}}",
+        "service": {{ toJSON .Response.Data.service }}
+      }
+
+  - name: "disable_service"
+    description: "Disable a service from starting at boot"
+    method: "POST"
+    endpoint: "http://localhost:8080/services/{{.Args.service_name}}/disable"
+    args:
+      - name: "service_name"
+        position: "path"
+        required: true
+        type: "string"
+        description: "Name of the service to disable"
+      - name: "type"
+        position: "query"
+        required: false
+        type: "string"
+        description: "Service type (systemd, sysv, docker)"
+        default: ""
+    responseBody: |-
+      {
+        "success": {{.Response.Data.success}},
+        "message": "{{.Response.Data.message}}",
+        "service": {{ toJSON .Response.Data.service }}
+      }
+
+  - name: "get_docker_logs"
+    description: "Get Docker container logs"
+    method: "GET"
+    endpoint: "http://localhost:8080/docker/{{.Args.container_name}}/logs"
+    args:
+      - name: "container_name"
+        position: "path"
+        required: true
+        type: "string"
+        description: "Name of the Docker container"
+      - name: "lines"
+        position: "query"
+        required: false
+        type: "integer"
+        description: "Number of log lines to retrieve"
+        default: "100"
+    responseBody: |-
+      {
+        "success": {{.Response.Data.success}},
+        "message": "{{.Response.Data.message}}",
+        "logs": {{ toJSON .Response.Data.logs }}
+      }

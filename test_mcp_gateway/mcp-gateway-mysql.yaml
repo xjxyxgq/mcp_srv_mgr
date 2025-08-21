@@ -1,0 +1,70 @@
+# MCP Gateway configuration for mcp_srv_mgr integration with MySQL
+port: 8081
+pid: "./test_mcp_gateway/mcp-gateway.pid"
+
+# Logger configuration
+logger:
+  level: "info"
+  format: "console"
+  output: "stdout"
+  color: true
+  stacktrace: false
+
+# Storage configuration using MySQL
+storage:
+  type: "db"
+  database:
+    type: "mysql"
+    host: "127.0.0.1"
+    port: 3311
+    user: "root"
+    password: "nov24feb11"
+    dbname: "unla_gateway"
+    # MySQL connection parameters
+    params:
+      charset: "utf8mb4"
+      parseTime: "true"
+      loc: "Local"
+    # Connection pool settings
+    maxIdleConns: 10
+    maxOpenConns: 100
+    connMaxLifetime: 3600  # seconds
+
+# Notifier configuration
+notifier:
+  role: "receiver"
+  type: "signal"
+  signal:
+    signal: "SIGHUP"
+    pid: "./test_mcp_gateway/mcp-gateway.pid"
+
+# Session storage using Redis
+session:
+  type: "redis"
+  redis:
+    addr: "127.0.0.1:6379"
+    password: ""
+    db: 0
+    poolSize: 10
+    minIdleConns: 5
+
+# OAuth2 configuration
+auth:
+  cors:
+    allowOrigins:
+      - "*"
+    allowMethods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "OPTIONS"
+    allowHeaders:
+      - "Content-Type"
+      - "Authorization"
+      - "Mcp-Session-Id"
+      - "mcp-protocol-version"
+    exposeHeaders:
+      - "Mcp-Session-Id"
+      - "mcp-protocol-version"
+    allowCredentials: true

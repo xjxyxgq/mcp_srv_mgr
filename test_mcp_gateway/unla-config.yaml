@@ -1,0 +1,218 @@
+# Unla MCP Gateway Configuration for mcp_srv_mgr integration
+name: mcp_srv_mgr_gateway
+version: "1.0.0"
+description: "MCP Service Manager Gateway Configuration for Unla"
+
+# Storage configuration
+storage:
+  type: db  # Use database storage
+  
+# Database configuration  
+database:
+  type: mysql
+  host: 127.0.0.1
+  port: 3311
+  user: root
+  password: nov24feb11
+  dbname: unla_gateway
+  sslmode: disable
+
+# Redis configuration for caching and pub/sub
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: ""
+  db: 0
+
+# Gateway server configuration
+server:
+  host: 0.0.0.0
+  port: 8081
+  enable_cors: true
+  max_connections: 1000
+  read_timeout: 30s
+  write_timeout: 30s
+
+# MCP Service Manager integrations
+integrations:
+  # HTTP REST API integration
+  - name: mcp_srv_mgr_http
+    type: http_api
+    description: "Linux Service Manager HTTP API"
+    endpoint: "http://127.0.0.1:8080"
+    enabled: true
+    health_check: "/health"
+    timeout: 30s
+    retry_count: 3
+    headers:
+      Content-Type: "application/json"
+    
+    # Convert REST API endpoints to MCP tools
+    tools:
+      - name: list_services
+        description: "List all available services"
+        method: GET
+        path: "/services"
+        parameters: []
+        
+      - name: get_service_status
+        description: "Get status of a specific service"
+        method: GET
+        path: "/services/{name}/status"
+        parameters:
+          - name: name
+            type: string
+            required: true
+            description: "Service name"
+          - name: type
+            type: string
+            required: false
+            description: "Service type (systemd, sysv, docker)"
+      
+      - name: start_service
+        description: "Start a service"
+        method: POST
+        path: "/services/{name}/start"
+        parameters:
+          - name: name
+            type: string
+            required: true
+            description: "Service name"
+          - name: type
+            type: string
+            required: false
+            description: "Service type (systemd, sysv, docker)"
+      
+      - name: stop_service
+        description: "Stop a service"
+        method: POST
+        path: "/services/{name}/stop"
+        parameters:
+          - name: name
+            type: string
+            required: true
+            description: "Service name"
+          - name: type
+            type: string
+            required: false
+            description: "Service type (systemd, sysv, docker)"
+      
+      - name: restart_service
+        description: "Restart a service"
+        method: POST
+        path: "/services/{name}/restart"
+        parameters:
+          - name: name
+            type: string
+            required: true
+            description: "Service name"
+          - name: type
+            type: string
+            required: false
+            description: "Service type (systemd, sysv, docker)"
+      
+      - name: enable_service
+        description: "Enable a service to start at boot"
+        method: POST
+        path: "/services/{name}/enable"
+        parameters:
+          - name: name
+            type: string
+            required: true
+            description: "Service name"
+          - name: type
+            type: string
+            required: false
+            description: "Service type (systemd, sysv, docker)"
+      
+      - name: disable_service
+        description: "Disable a service from starting at boot"
+        method: POST
+        path: "/services/{name}/disable"
+        parameters:
+          - name: name
+            type: string
+            required: true
+            description: "Service name"
+          - name: type
+            type: string
+            required: false
+            description: "Service type (systemd, sysv, docker)"
+      
+      - name: get_docker_logs
+        description: "Get Docker container logs"
+        method: GET
+        path: "/docker/{name}/logs"
+        parameters:
+          - name: name
+            type: string
+            required: true
+            description: "Container name"
+          - name: lines
+            type: integer
+            required: false
+            description: "Number of log lines to retrieve"
+
+  # MCP stdio protocol integration
+  - name: mcp_srv_mgr_stdio
+    type: mcp_stdio
+    description: "Linux Service Manager MCP stdio protocol"
+    command: "./mcp-server"
+    args: ["-mode=mcp"]
+    working_directory: "/Users/xuguoqiang/SynologyDrive/Backup/MI_office_notebook/D/myworkspace/nucc_workspace/program/src/nucc.com/mcp_srv_mgr"
+    enabled: true
+    timeout: 30s
+    restart_on_failure: true
+    environment:
+      MCP_LOG_LEVEL: "info"
+
+  # MCP over HTTP (SSE) protocol integration
+  - name: mcp_srv_mgr_http_sse
+    type: mcp_http_sse
+    description: "Linux Service Manager MCP over HTTP (SSE)"
+    endpoint: "http://127.0.0.1:8082"
+    enabled: true
+    server_command: "./mcp-server"
+    server_args: ["-mode=mcp-http", "-config=config.yaml"]
+    server_working_directory: "/Users/xuguoqiang/SynologyDrive/Backup/MI_office_notebook/D/myworkspace/nucc_workspace/program/src/nucc.com/mcp_srv_mgr"
+    timeout: 30s
+    environment:
+      MCP_HOST: "127.0.0.1"
+      MCP_PORT: "8082"
+      MCP_LOG_LEVEL: "info"
+
+  # MCP Streamable HTTP protocol integration
+  - name: mcp_srv_mgr_streamable
+    type: mcp_streamable_http
+    description: "Linux Service Manager MCP Streamable HTTP"
+    endpoint: "http://127.0.0.1:8083"
+    enabled: true
+    server_command: "./mcp-server"
+    server_args: ["-mode=mcp-streamable", "-config=config.yaml"]
+    server_working_directory: "/Users/xuguoqiang/SynologyDrive/Backup/MI_office_notebook/D/myworkspace/nucc_workspace/program/src/nucc.com/mcp_srv_mgr"
+    timeout: 30s
+    environment:
+      MCP_HOST: "127.0.0.1"
+      MCP_PORT: "8083"
+      MCP_LOG_LEVEL: "info"
+
+# Logging configuration
+logging:
+  level: info
+  format: json
+  output: stdout
+  file: /tmp/unla-gateway.log
+
+# Security configuration
+security:
+  jwt_secret: "unla_mcp_srv_mgr_secret_key_2024"
+  enable_auth: false
+  admin_username: admin
+  admin_password: admin123
+  session_timeout: 3600
+
+# Monitoring and metrics
+monitoring:
+  enable_metrics: true
+  metrics_port: 9090
+  health_check_interval: 30s

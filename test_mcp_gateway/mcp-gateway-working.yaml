@@ -1,0 +1,50 @@
+# MCP Gateway configuration for mcp_srv_mgr integration
+port: 8081
+pid: "./test_mcp_gateway/mcp-gateway.pid"
+
+# Logger configuration
+logger:
+  level: "info"
+  format: "console"
+  output: "stdout"
+  color: true
+  stacktrace: false
+
+# Storage configuration using SQLite for simplicity
+storage:
+  type: "db"
+  database:
+    type: "sqlite"
+    dbname: "./test_mcp_gateway/mcp-gateway.db"
+
+# Notifier configuration
+notifier:
+  role: "receiver"
+  type: "signal"
+  signal:
+    signal: "SIGHUP"
+    pid: "./test_mcp_gateway/mcp-gateway.pid"
+
+# Session storage in memory for testing
+session:
+  type: "memory"
+
+# OAuth2 configuration
+auth:
+  cors:
+    allowOrigins:
+      - "*"
+    allowMethods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "OPTIONS"
+    allowHeaders:
+      - "Content-Type"
+      - "Authorization"
+      - "Mcp-Session-Id"
+      - "mcp-protocol-version"
+    exposeHeaders:
+      - "Mcp-Session-Id"
+      - "mcp-protocol-version"
+    allowCredentials: true

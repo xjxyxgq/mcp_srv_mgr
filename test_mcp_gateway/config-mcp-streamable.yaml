@@ -1,0 +1,9 @@
+# Configuration for mcp_srv_mgr MCP Streamable HTTP mode
+server:
+  host: "127.0.0.1"
+  port: 8083
+
+log:
+  level: "info"
+  format: "json"
+  output: "stdout"

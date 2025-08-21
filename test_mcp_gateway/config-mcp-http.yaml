@@ -1,0 +1,9 @@
+# Configuration for mcp_srv_mgr MCP over HTTP (SSE) mode
+server:
+  host: "127.0.0.1"
+  port: 8082
+
+log:
+  level: "info"
+  format: "json"
+  output: "stdout"
